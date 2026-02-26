@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Hero() {
   return (
@@ -41,12 +42,12 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.8 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12"
         >
-          <a
-            href="#apply"
+          <Link
+            to="/#apply"
             className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-full font-bold uppercase tracking-wider transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(234,88,12,0.4)]"
           >
             Подать заявку
-          </a>
+          </Link>
           <a
             href="#calendar"
             className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white rounded-full font-bold uppercase tracking-wider transition-all"

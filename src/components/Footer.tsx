@@ -1,12 +1,14 @@
+import { Link } from 'react-router-dom';
+
 export default function Footer() {
   return (
     <footer className="bg-black text-zinc-500 py-12 border-t border-zinc-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <div>
-            <a href="#" className="text-2xl font-bold text-white tracking-tighter uppercase mb-4 block">
+            <Link to="/" className="text-2xl font-bold text-white tracking-tighter uppercase mb-4 block">
               Вдохновение
-            </a>
+            </Link>
             <p className="text-sm max-w-xs leading-relaxed">
               Творческое движение, объединяющее таланты со всей страны. Фестивали, конкурсы, мастер-классы.
             </p>
@@ -17,10 +19,10 @@ export default function Footer() {
               Навигация
             </h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#about" className="hover:text-orange-500 transition-colors">О Вдохновении</a></li>
-              <li><a href="#calendar" className="hover:text-orange-500 transition-colors">Календарь</a></li>
-              <li><a href="#jury" className="hover:text-orange-500 transition-colors">Жюри</a></li>
-              <li><a href="#contacts" className="hover:text-orange-500 transition-colors">Контакты</a></li>
+              <li><Link to="/#about" className="hover:text-orange-500 transition-colors">О Вдохновении</Link></li>
+              <li><Link to="/#calendar" className="hover:text-orange-500 transition-colors">Календарь</Link></li>
+              <li><Link to="/#jury" className="hover:text-orange-500 transition-colors">Жюри</Link></li>
+              <li><Link to="/committee" className="hover:text-orange-500 transition-colors">Оргкомитет</Link></li>
             </ul>
           </div>
 
@@ -38,7 +40,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
           <p>
-            © {new Date().getFullYear()} ООО «Вдохновение». Все права защищены.
+            © {new Date().getFullYear()} ООО «vremya-tancevat». Все права защищены.
           </p>
           <p>
             ИНН: 7810341160 ОГРН: 1157847083767
