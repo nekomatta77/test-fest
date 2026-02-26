@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Home, Briefcase, CheckCircle, Plus, Trash2 } from 'lucide-react';
+import { X, Home, Briefcase, CheckCircle, Plus, Trash2, Calendar as CalendarIcon } from 'lucide-react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { ru } from 'date-fns/locale/ru';
+
+registerLocale('ru', ru);
 
 type Step = 'selection' | 'step1_local' | 'step1_remote' | 'step2_remote' | 'program' | 'awards' | 'success';
 
@@ -16,12 +21,42 @@ export default function ApplicationModal({ isOpen, onClose, initialData }: Appli
     phone: '',
     groupName: '',
     type: '',
+    date: '',
+    city: '',
+    leaderName: '',
+    teacherName: '',
+    email: '',
+    socials: '',
+    participantsInfo: '',
+    accompanyingCount: '',
+    manager: '',
+    grantCertificate: '',
+    arrivalDate: '',
+    departureDate: '',
+    roomNameAndMedals: '',
   });
 
   useEffect(() => {
     if (isOpen) {
       setStep('selection');
-      setFormData((prev) => ({ ...prev, phone: initialData.phone, groupName: initialData.groupName }));
+      setFormData((prev) => ({ 
+        ...prev, 
+        phone: initialData.phone, 
+        groupName: initialData.groupName,
+        date: '',
+        city: '',
+        leaderName: '',
+        teacherName: '',
+        email: '',
+        socials: '',
+        participantsInfo: '',
+        accompanyingCount: '',
+        manager: '',
+        grantCertificate: '',
+        arrivalDate: '',
+        departureDate: '',
+        roomNameAndMedals: '',
+      }));
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
@@ -36,6 +71,52 @@ export default function ApplicationModal({ isOpen, onClose, initialData }: Appli
   const handleSelectType = (type: 'local' | 'remote') => {
     setFormData((prev) => ({ ...prev, type }));
     setStep(type === 'local' ? 'step1_local' : 'step1_remote');
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const formatDate = (date: Date | null) => {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const validateStep1Local = () => {
+    const required = ['date', 'groupName', 'city', 'leaderName', 'phone', 'participantsInfo', 'manager'];
+    for (const field of required) {
+      if (!formData[field as keyof typeof formData]) {
+        alert('Пожалуйста, заполните все обязательные поля, отмеченные оранжевой звездочкой.');
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const validateStep1Remote = () => {
+    const required = ['date', 'groupName', 'city', 'leaderName', 'phone', 'participantsInfo', 'manager', 'arrivalDate', 'departureDate', 'roomNameAndMedals'];
+    for (const field of required) {
+      if (!formData[field as keyof typeof formData]) {
+        alert('Пожалуйста, заполните все обязательные поля, отмеченные оранжевой звездочкой.');
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleNextFromLocal = () => {
+    if (validateStep1Local()) {
+      setStep('program');
+    }
+  };
+
+  const handleNextFromRemote = () => {
+    if (validateStep1Remote()) {
+      setStep('step2_remote');
+    }
   };
 
   const renderStep = () => {
@@ -89,33 +170,67 @@ export default function ApplicationModal({ isOpen, onClose, initialData }: Appli
             <p className="text-center text-zinc-400 mb-6 font-bold uppercase tracking-wider text-sm">Шаг 1: Общие данные (Местные)</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Дата фестиваля *</label>
-                <input type="date" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+              <div className="relative">
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Дата проведения <span className="text-orange-500">*</span></label>
+                <DatePicker
+                  selected={formData.date ? new Date(formData.date) : null}
+                  onChange={(date: Date | null) => handleInputChange('date', formatDate(date))}
+                  locale="ru"
+                  dateFormat="dd.MM.yyyy"
+                  placeholderText="Выберите дату"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500"
+                  required
+                />
+                <CalendarIcon className="absolute right-4 top-9 text-zinc-500 pointer-events-none" size={20} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Название коллектива *</label>
-                <input type="text" defaultValue={formData.groupName} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Полное название коллектива <span className="text-orange-500">*</span></label>
+                <input type="text" value={formData.groupName} onChange={(e) => handleInputChange('groupName', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
               </div>
               <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Страна, город *</label>
-                <input type="text" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Страна, город <span className="text-orange-500">*</span></label>
+                <input type="text" value={formData.city} onChange={(e) => handleInputChange('city', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
               </div>
               <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">ФИО руководителя *</label>
-                <input type="text" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Ф.И.О Руководителя <span className="text-orange-500">*</span></label>
+                <input type="text" value={formData.leaderName} onChange={(e) => handleInputChange('leaderName', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
               </div>
               <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Контактный телефон *</label>
-                <input type="tel" defaultValue={formData.phone} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Ф.И.О педагога/репетитора</label>
+                <input type="text" value={formData.teacherName} onChange={(e) => handleInputChange('teacherName', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Контактный телефон <span className="text-orange-500">*</span></label>
+                <input type="tel" value={formData.phone} onChange={(e) => handleInputChange('phone', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Email руководителя</label>
-                <input type="email" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
+                <input type="email" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Ссылка на соцсети</label>
+                <input type="text" value={formData.socials} onChange={(e) => handleInputChange('socials', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Кол-во участников + возраст *</label>
-                <textarea rows={2} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" placeholder="Беби - 10, Взрослые - 24" required></textarea>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Кол-во участников + возраст <span className="text-orange-500">*</span></label>
+                <textarea rows={2} value={formData.participantsInfo} onChange={(e) => handleInputChange('participantsInfo', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" placeholder="Беби - 10, Взрослые - 24" required></textarea>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Кол-во сопровождающих</label>
+                <input type="number" value={formData.accompanyingCount} onChange={(e) => handleInputChange('accompanyingCount', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Ваш менеджер <span className="text-orange-500">*</span></label>
+                <select value={formData.manager} onChange={(e) => handleInputChange('manager', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required>
+                  <option value="">Выберите менеджера</option>
+                  <option value="Анна">Анна</option>
+                  <option value="Любовь">Любовь</option>
+                  <option value="Светлана">Светлана</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Грантовый сертификат</label>
+                <input type="text" value={formData.grantCertificate} onChange={(e) => handleInputChange('grantCertificate', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" placeholder="Номер сертификата (если есть)" />
               </div>
             </div>
 
@@ -123,7 +238,7 @@ export default function ApplicationModal({ isOpen, onClose, initialData }: Appli
               <button type="button" onClick={() => setStep('selection')} className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl py-4 font-bold uppercase tracking-wider transition-colors">
                 Назад
               </button>
-              <button type="button" onClick={() => setStep('program')} className="flex-1 bg-orange-600 hover:bg-orange-700 text-white rounded-xl py-4 font-bold uppercase tracking-wider transition-colors">
+              <button type="button" onClick={handleNextFromLocal} className="flex-1 bg-orange-600 hover:bg-orange-700 text-white rounded-xl py-4 font-bold uppercase tracking-wider transition-colors">
                 Далее
               </button>
             </div>
@@ -142,52 +257,104 @@ export default function ApplicationModal({ isOpen, onClose, initialData }: Appli
             <p className="text-center text-zinc-400 mb-6 font-bold uppercase tracking-wider text-sm">Шаг 1: Общие данные (Иногородние)</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Дата фестиваля *</label>
-                <input type="date" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+              <div className="relative">
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Дата проведения <span className="text-orange-500">*</span></label>
+                <DatePicker
+                  selected={formData.date ? new Date(formData.date) : null}
+                  onChange={(date: Date | null) => handleInputChange('date', formatDate(date))}
+                  locale="ru"
+                  dateFormat="dd.MM.yyyy"
+                  placeholderText="Выберите дату"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500"
+                  required
+                />
+                <CalendarIcon className="absolute right-4 top-9 text-zinc-500 pointer-events-none" size={20} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Название коллектива *</label>
-                <input type="text" defaultValue={formData.groupName} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Полное название коллектива <span className="text-orange-500">*</span></label>
+                <input type="text" value={formData.groupName} onChange={(e) => handleInputChange('groupName', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
               </div>
               <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Страна, город *</label>
-                <input type="text" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Страна, город <span className="text-orange-500">*</span></label>
+                <input type="text" value={formData.city} onChange={(e) => handleInputChange('city', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
               </div>
               <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">ФИО руководителя *</label>
-                <input type="text" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Ф.И.О Руководителя <span className="text-orange-500">*</span></label>
+                <input type="text" value={formData.leaderName} onChange={(e) => handleInputChange('leaderName', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
               </div>
               <div>
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Контактный телефон *</label>
-                <input type="tel" defaultValue={formData.phone} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Ф.И.О педагога/репетитора</label>
+                <input type="text" value={formData.teacherName} onChange={(e) => handleInputChange('teacherName', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Контактный телефон <span className="text-orange-500">*</span></label>
+                <input type="tel" value={formData.phone} onChange={(e) => handleInputChange('phone', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Email руководителя</label>
-                <input type="email" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
+                <input type="email" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
               </div>
-              
-              <div className="md:col-span-2 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800">
-                <label className="block text-xs font-bold text-orange-500 uppercase tracking-widest mb-3">Приезд</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <input type="date" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500" />
-                  <input type="time" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500" />
-                  <input type="text" placeholder="Вокзал / Рейс" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500" />
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Ссылка на соцсети</label>
+                <input type="text" value={formData.socials} onChange={(e) => handleInputChange('socials', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Кол-во участников + возраст <span className="text-orange-500">*</span></label>
+                <textarea rows={2} value={formData.participantsInfo} onChange={(e) => handleInputChange('participantsInfo', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" placeholder="Беби - 10, Взрослые - 24" required></textarea>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Кол-во сопровождающих</label>
+                <input type="number" value={formData.accompanyingCount} onChange={(e) => handleInputChange('accompanyingCount', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Ваш менеджер <span className="text-orange-500">*</span></label>
+                <select value={formData.manager} onChange={(e) => handleInputChange('manager', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" required>
+                  <option value="">Выберите менеджера</option>
+                  <option value="Анна">Анна</option>
+                  <option value="Любовь">Любовь</option>
+                  <option value="Светлана">Светлана</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Грантовый сертификат</label>
+                <input type="text" value={formData.grantCertificate} onChange={(e) => handleInputChange('grantCertificate', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" placeholder="Номер сертификата (если есть)" />
               </div>
 
               <div className="md:col-span-2 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800">
-                <label className="block text-xs font-bold text-orange-500 uppercase tracking-widest mb-3">Отъезд</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <input type="date" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500" />
-                  <input type="time" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500" />
-                  <input type="text" placeholder="Вокзал / Рейс" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500" />
+                <label className="block text-xs font-bold text-orange-500 uppercase tracking-widest mb-3">Приезд и Отъезд <span className="text-orange-500">*</span></label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="relative">
+                    <label className="block text-xs text-zinc-500 mb-1">Дата приезда</label>
+                    <DatePicker
+                      selected={formData.arrivalDate ? new Date(formData.arrivalDate) : null}
+                      onChange={(date: Date | null) => handleInputChange('arrivalDate', formatDate(date))}
+                      locale="ru"
+                      dateFormat="dd.MM.yyyy"
+                      placeholderText="Выберите дату"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500"
+                      required
+                    />
+                    <CalendarIcon className="absolute right-3 top-8 text-zinc-500 pointer-events-none" size={16} />
+                  </div>
+                  <div className="relative">
+                    <label className="block text-xs text-zinc-500 mb-1">Дата отъезда</label>
+                    <DatePicker
+                      selected={formData.departureDate ? new Date(formData.departureDate) : null}
+                      onChange={(date: Date | null) => handleInputChange('departureDate', formatDate(date))}
+                      locale="ru"
+                      dateFormat="dd.MM.yyyy"
+                      placeholderText="Выберите дату"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500"
+                      required
+                    />
+                    <CalendarIcon className="absolute right-3 top-8 text-zinc-500 pointer-events-none" size={16} />
+                  </div>
                 </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Кол-во участников + возраст *</label>
-                <textarea rows={2} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" placeholder="Беби - 10, Взрослые - 24" required></textarea>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Название номера (в пакете) + кол-во медалей <span className="text-orange-500">*</span></label>
+                <textarea rows={2} value={formData.roomNameAndMedals} onChange={(e) => handleInputChange('roomNameAndMedals', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500" placeholder="Например: Номер 'Весна', 15 медалей" required></textarea>
               </div>
             </div>
 
@@ -195,7 +362,7 @@ export default function ApplicationModal({ isOpen, onClose, initialData }: Appli
               <button type="button" onClick={() => setStep('selection')} className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl py-4 font-bold uppercase tracking-wider transition-colors">
                 Назад
               </button>
-              <button type="button" onClick={() => setStep('step2_remote')} className="flex-1 bg-orange-600 hover:bg-orange-700 text-white rounded-xl py-4 font-bold uppercase tracking-wider transition-colors">
+              <button type="button" onClick={handleNextFromRemote} className="flex-1 bg-orange-600 hover:bg-orange-700 text-white rounded-xl py-4 font-bold uppercase tracking-wider transition-colors">
                 К проживанию
               </button>
             </div>

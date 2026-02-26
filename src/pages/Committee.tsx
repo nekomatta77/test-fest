@@ -10,6 +10,10 @@ export default function Committee() {
   const location = useLocation();
 
   useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    
     if (location.hash) {
       const id = location.hash.replace('#', '');
       const element = document.getElementById(id);
@@ -19,13 +23,38 @@ export default function Committee() {
         }, 100);
       }
     } else {
+      document.documentElement.style.scrollBehavior = 'auto';
       window.scrollTo(0, 0);
+      setTimeout(() => {
+        document.documentElement.style.scrollBehavior = 'smooth';
+      }, 10);
     }
   }, [location]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.phone.length < 18) {
+      alert('Пожалуйста, введите корректный номер телефона');
+      return;
+    }
     setIsModalOpen(true);
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.length === 0) {
+      setFormData({ ...formData, phone: '' });
+      return;
+    }
+    if (val[0] === '8' || val[0] === '7') {
+      val = val.substring(1);
+    }
+    let formatted = '+7';
+    if (val.length > 0) formatted += ` (${val.substring(0, 3)}`;
+    if (val.length >= 4) formatted += `) ${val.substring(3, 6)}`;
+    if (val.length >= 7) formatted += `-${val.substring(6, 8)}`;
+    if (val.length >= 9) formatted += `-${val.substring(8, 10)}`;
+    setFormData({ ...formData, phone: formatted });
   };
 
   const committeeMembers = [
@@ -158,7 +187,8 @@ export default function Committee() {
                     type="tel"
                     required
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={handlePhoneChange}
+                    maxLength={18}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-orange-500 transition-colors"
                     placeholder="+7 (999) 000-00-00"
                   />

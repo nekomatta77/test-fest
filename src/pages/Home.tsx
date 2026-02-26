@@ -25,6 +25,10 @@ export default function Home() {
   const location = useLocation();
 
   useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    
     if (location.hash) {
       const id = location.hash.replace('#', '');
       const element = document.getElementById(id);
@@ -34,7 +38,11 @@ export default function Home() {
         }, 100);
       }
     } else {
+      document.documentElement.style.scrollBehavior = 'auto';
       window.scrollTo(0, 0);
+      setTimeout(() => {
+        document.documentElement.style.scrollBehavior = 'smooth';
+      }, 10);
     }
   }, [location]);
 

@@ -26,13 +26,13 @@ export default function Hero() {
           <p className="text-orange-500 font-medium tracking-[0.2em] uppercase mb-4 text-sm md:text-base">
             Международный фестиваль-конкурс
           </p>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-8">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tighter leading-[1] sm:leading-[0.9] mb-8">
             Творческое <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-600">
               Движение
             </span>
             <br />
-            Фест-Пространство
+            <span className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl break-words">Фест-Пространство</span>
           </h1>
         </motion.div>
 
