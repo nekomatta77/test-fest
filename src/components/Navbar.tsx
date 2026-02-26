@@ -53,7 +53,8 @@ export default function Navbar() {
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="flex items-center gap-3 text-2xl font-bold text-white tracking-tighter uppercase">
-              <img src="/assets/logo.png" alt="Logo" className="h-8 w-auto object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              {/* Убрали текст из alt="", чтобы он не появлялся при поиске картинки */}
+              <img src="/images/logo.png" alt="" className="h-8 w-auto object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               Фест-Пространство
             </Link>
           </div>
