@@ -32,7 +32,7 @@ export default function Hero() {
               Движение
             </span>
             <br />
-            Вдохновение
+            Фест-Пространство
           </h1>
         </motion.div>
 

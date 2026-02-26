@@ -18,7 +18,7 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'О Вдохновении', href: '/#about' },
+    { name: 'О Фест-Пространстве', href: '/#about' },
     { name: 'Календарь', href: '/#calendar' },
     { name: 'Жюри', href: '/#jury' },
     { name: 'Оргкомитет', href: '/committee' },
@@ -52,8 +52,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="text-2xl font-bold text-white tracking-tighter uppercase">
-              Вдохновение
+            <Link to="/" className="flex items-center gap-3 text-2xl font-bold text-white tracking-tighter uppercase">
+              <img src="/assets/logo.png" alt="Logo" className="h-8 w-auto object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              Фест-Пространство
             </Link>
           </div>
           

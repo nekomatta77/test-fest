@@ -48,7 +48,7 @@ export default function ApplySection() {
                   value={formData.groupName}
                   onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-orange-500 transition-colors"
-                  placeholder="Ансамбль 'Вдохновение'"
+                  placeholder="Ансамбль 'Фест-Пространство'"
                 />
               </div>
               <button
